@@ -29,6 +29,7 @@ void setup() {
 }
 
 void loop() {
+  mission.updateCurrLocation();
  
   doMission((mission.getY() > midpointY)); 
   //if the y position is greater than the midpoint, then the robot is on the north side and the mission is on the south side. else, vice versa.
@@ -46,19 +47,26 @@ void loop() {
 }
 
 void doMission(boolean robotIsNorth) { // true if north, false if south
+  mission.updateCurrLocation();
   armServo.runArmUp();
   if (robotIsNorth) {
     propulsion.turnTo(-PI/2);
+    mission.updateCurrLocation();
     while(mission.getY() > southTopEdge){     // POINT AT WHICH ARM IS HOVERING OVER MIDPOINT OF DATA EXTRACTION POINT
      propulsion.driveFwd();
+     mission.updateCurrLocation();
     }
     propulsion.stopMotors();
+    mission.updateCurrLocation();
   } else {
       propulsion.turnTo(PI/2);
+      mission.updateCurrLocation();
       while(mission.getY() < northBottomEdge) { // POINT AT WHICH ARM IS HOVERING OVER MIDPOINT OF DATA EXTRACTION POINT
         propulsion.driveFwd();
+        mission.updateCurrLocation();
       }
       propulsion.stopMotors();
+      mission.updateCurrLocation();
   }
 
   // doing the mission stuff
@@ -72,55 +80,76 @@ void doMission(boolean robotIsNorth) { // true if north, false if south
   if(robotIsNorth) { // robot WAS north, and is now south
     while(mission.getY() < midpointY) {
       propulsion.driveBackwd(); 
+      mission.updateCurrLocation();
     }
   } else {          // robot WAS south, and is now north
     while(mission.getY() > midpointY) {
       propulsion.driveBackwd();
+      mission.updateCurrLocation();
     }
   }
   propulsion.stopMotors();
+  mission.updateCurrLocation();
 
   // navigate to side edge of mission site
   armServo.runArmDown();
   propulsion.turnTo(0);
+  mission.updateCurrLocation();
   while (mission.getX() < sidePointMissionSite) {
     propulsion.driveFwd();
+    mission.updateCurrLocation();
   }
   propulsion.stopMotors();
+  mission.updateCurrLocation();
   
 }
 
 void prepareNav() {
   propulsion.turnTo(PI/2);
+  mission.updateCurrLocation();
   while(mission.getY() > bottomObstacleField) {
     propulsion.driveBackwd();
+    mission.updateCurrLocation();
   }
   propulsion.stopMotors();
+  mission.updateCurrLocation();
 }
 void findHole() {
   while(sensors.getUltrasonic() < obstacleExists) {
     propulsion.driveFwd();
+    mission.updateCurrLocation();
   }
   propulsion.stopMotors();
+  mission.updateCurrLocation();
+
   propulsion.driveFwd();
   delay(timeToClearObstacleY);
   propulsion.stopMotors();
+  mission.updateCurrLocation();
+
   propulsion.turnTo(0);
+  mission.updateCurrLocation();
   propulsion.driveFwd();
   delay(timeToClearObstacleX);
   propulsion.stopMotors();
+  mission.updateCurrLocation();
 }
 
 void clearLimbo() {
   propulsion.turnTo(PI/2);
+  mission.updateCurrLocation();
   while(mission.getY() < limboMidPoint) {
     propulsion.driveFwd();
+    mission.updateCurrLocation();
   }
   propulsion.stopMotors();
+
   propulsion.turnTo(0);
+  mission.updateCurrLocation();
   propulsion.driveFwd();
   delay(timeToClearLimbo);
   propulsion.stopMotors();
+  mission.updateCurrLocation();
 }
 
 void finish() {
